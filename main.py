@@ -20,7 +20,12 @@ def main():
     base_url = os.getenv("BASE_URL")
     model = os.getenv("MODEL")
 
-    validateEnvVariables(api_key, prime, base_url, model)
+    validateEnvVariables(
+        api_key=api_key,
+        base_url=base_url,
+        prime=prime,
+        model=model
+    )
 
     final_format = openSrcCode(filePath, prime)
     
@@ -30,18 +35,10 @@ def main():
     )
     aiCall(final_format, client, model, "feedback.txt")
 
-def validateEnvVariables(api_key, base_url, prime, model):
-    if not api_key:
-        raise ValueError("API key is missing.")
-
-    if not base_url:
-        raise ValueError("Base URL is missing")
-
-    if not prime:
-        raise ValueError("Prime is missing.")
-
-    if not model:
-        raise ValueError("Model is missing.")
+def validateEnvVariables(**kwargs):
+    missing = [key for key, value in kwargs.items() if not value]
+    if missing:
+        raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
 def validateArguments(args):
     if len(args) != 2:
@@ -67,9 +64,6 @@ def openSrcCode(filePath, prime):
 def aiCall(prompt, client, model, filename):
     print("Loading...")
     try:
-        # message = [
-        #    {"role": "user", "content": final_format}
-        # ]
         message = [
             {
                 "role": "user",
